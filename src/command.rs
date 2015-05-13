@@ -1,6 +1,6 @@
 
 use help::HelpPrinter;
-
+use arguments::Arguments;
 
 /// The command structure
 pub trait Command {
@@ -8,47 +8,10 @@ pub trait Command {
 	fn show_short_help(&self, &mut HelpPrinter);
 	fn show_long_help(&self, &mut HelpPrinter);
 	
-	fn execute(&self, args: Arguments);
+	fn execute(&self, mut args: Arguments);
 	fn is_called(&self, &String) -> bool;
 
 }
-
-#[derive(Debug)]
-pub struct Arguments {
-    args: Vec<String>,
-}
-
-#[derive(Debug)]
-pub enum ValueArgument {
-    Supplied(String),
-    MissingValue,
-    NotSupplied
-}
-
-impl Arguments {
-	
-	pub fn new(args: &[String]) -> Self {
-		return Arguments{args: args.to_owned()};
-	}
-	
-	pub fn get_value(&self, name : &str) -> ValueArgument {
-	
-	    let last = self.args.len();
-	    for i in 0..last {
-	        let val = &self.args[i];
-	        if (val == name) {
-	            if i < last - 1 {
-	                return ValueArgument::Supplied(self.args[i + 1].clone());
-	            } else {
-	                return ValueArgument::MissingValue;
-	            }
-	        }
-	    }
-	    return ValueArgument::NotSupplied;
-	}
-}
-
-
 
 pub struct CommandList {
 	commands : Vec<Box<Command>>,

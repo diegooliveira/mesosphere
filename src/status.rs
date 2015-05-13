@@ -1,6 +1,8 @@
 
-use command::{Command, Arguments, ValueArgument};
+use command::Command;
 use help::HelpPrinter;
+use arguments::{Arguments, ValueArgument};
+use marathon::Marathon;
 
 
 pub struct Status;
@@ -25,7 +27,7 @@ Sample usage:
 
 impl Command for Status {
 
-	fn execute(&self, args: Arguments){
+	fn execute(&self, mut args: Arguments){
 		
 		/*
 		let cluster = match Cluster::fromArgs(args) {
@@ -34,10 +36,11 @@ impl Command for Status {
 		    
 		    }
 		};
-		
 		*/
-		
-		match args.get_value("--srv") {
+
+        let names = Vec::new();
+
+		match args.get_param("--srv") {
 		    ValueArgument::Supplied(srv_id) => {
 		        // List the content of the supplied directory
 		        // and deploy everething 
@@ -50,7 +53,7 @@ impl Command for Status {
 		    _ => { }
 		}
 		
-		match args.get_value("--job") {
+		match args.get_param("--job") {
 		    ValueArgument::Supplied(job_id) => {
 		        // List the content of the supplied directory
 		        // and deploy everething 
@@ -63,7 +66,7 @@ impl Command for Status {
 		    _ => { }
 		}
 		
-		match args.get_value("-r") {
+		match args.get_param("-r") {
 		    ValueArgument::Supplied(directory) => {
 		        // List the content of the supplied directory
 		        // and deploy everething 
@@ -77,8 +80,20 @@ impl Command for Status {
 		    _ => {}
 		}
 		
+		match args.get_remmaning_params() {
+		    Some(params) => {
+		        println!("Invalid parameters:");
+		        for param in params {
+    		        println!("\t{}", param.name);
+		        }
+		    },
+		    None => {}
+		}
 		
-		//list_status( || args.get_arguments());
+		let descriptors = args.get_arguments();
+		if !descriptors.is_empty() {
+		    println!("from descriptors {:?}", descriptors)
+		}
 	}
 	
 	fn show_short_help(&self, hp : &mut HelpPrinter){
@@ -93,4 +108,5 @@ impl Command for Status {
 		return "status" == name;
 	}
 }
+
 

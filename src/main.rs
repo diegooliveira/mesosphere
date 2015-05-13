@@ -6,6 +6,7 @@ mod command;
 mod help;
 mod deploy;
 mod status;
+mod arguments;
 
 use std::env;
 
