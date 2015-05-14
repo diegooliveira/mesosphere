@@ -4,9 +4,11 @@ extern crate getopts;
 
 mod command;
 mod help;
+mod framework;
 mod deploy;
 mod status;
 mod arguments;
+mod file_walker;
 
 use std::env;
 

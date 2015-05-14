@@ -2,13 +2,46 @@
 use command::Command;
 use help::HelpPrinter;
 use arguments::Arguments;
+use framework::Framework;
+use file_walker;
+
 
 pub struct Deploy;
 
 impl Command for Deploy {
 
-	fn execute(&self, args: Arguments){
-		println!("deploy {:?}", args);
+	fn execute(&self, mut args: Arguments){
+		
+		
+		match args.get_remmaning_params() {
+		    Some(params) => {
+		        println!("Invalid parameters:");
+		        for param in params {
+    		        println!("\t{}", param.name);
+		        }
+		    },
+		    None => {}
+		}
+		
+	    let descriptors = args.get_arguments();
+		if descriptors.is_empty() {
+		   println!("Error: Missing deployment descriptor"); 
+		} else {
+		    file_walker::walk(descriptors, |descriptor, content| {
+		    
+		    
+		        match Framework::of(descriptor) {
+		        
+		            Some(framework) => {
+    		            framework.deploy(content);
+		            },
+		            None => {
+		                println!("Invalid file: {}", descriptor);
+		            }
+		        }
+		    });
+		}
+		
 	}
 	
 	fn show_short_help(&self, hp : &mut HelpPrinter){

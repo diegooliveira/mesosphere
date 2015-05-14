@@ -2,8 +2,7 @@
 use command::Command;
 use help::HelpPrinter;
 use arguments::{Arguments, ValueArgument};
-use marathon::Marathon;
-
+use file_walker;
 
 pub struct Status;
 
@@ -38,7 +37,6 @@ impl Command for Status {
 		};
 		*/
 
-        let names = Vec::new();
 
 		match args.get_param("--srv") {
 		    ValueArgument::Supplied(srv_id) => {
@@ -92,7 +90,7 @@ impl Command for Status {
 		
 		let descriptors = args.get_arguments();
 		if !descriptors.is_empty() {
-		    println!("from descriptors {:?}", descriptors)
+		    file_walker::walk(descriptors, |y, x| println!("{}", x) );
 		}
 	}
 	
