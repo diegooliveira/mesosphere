@@ -1,4 +1,24 @@
 {
-	"default_env" : "qa"
-
+    "default" : "qa",
+    "cluster" : 
+    [
+        {
+            "name" : "qa",
+            "marathon" : "http://qa.marathon.com.br",
+            "chronos" : "http://qa.chonos.com.br",
+            "binary" : "http://qa.binay.com.br"
+        },
+        {
+            "name" : "gl",
+            "marathon" : "http://glete.marathon.com.br",
+            "chronos" : "http://glete.chonos.com.br",
+            "binary" : "http://glete.binay.com.br"
+        },
+        {
+            "name" : "tb",
+            "marathon" : "http://tb.marathon.com.br",
+            "chronos" : "http://tb.chonos.com.br",
+            "binary" : "http://tb.binay.com.br"
+        }
+    ]
 }

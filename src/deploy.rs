@@ -3,6 +3,7 @@ use command::Command;
 use help::HelpPrinter;
 use arguments::Arguments;
 use framework::Framework;
+use configuration::Configuration;
 use file_walker;
 
 
@@ -12,6 +13,12 @@ impl Command for Deploy {
 
 	fn execute(&self, mut args: Arguments){
 		
+		let cluster = match Configuration::load(&mut args){
+		    Some(cfg) => cfg,
+		    None => {
+		        return;
+		    }
+		};
 		
 		match args.get_remmaning_params() {
 		    Some(params) => {
@@ -19,8 +26,9 @@ impl Command for Deploy {
 		        for param in params {
     		        println!("\t{}", param.name);
 		        }
+		        return;     
 		    },
-		    None => {}
+		    None => { }
 		}
 		
 	    let descriptors = args.get_arguments();
@@ -33,7 +41,7 @@ impl Command for Deploy {
 		        match Framework::of(descriptor) {
 		        
 		            Some(framework) => {
-    		            framework.deploy(content);
+    		            framework.deploy(&content, &cluster);
 		            },
 		            None => {
 		                println!("Invalid file: {}", descriptor);

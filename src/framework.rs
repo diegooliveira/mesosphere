@@ -1,20 +1,20 @@
 
+use configuration::Cluster;
 
-#[derive(Debug)]
-pub enum Framework {
+pub trait Framework {
 
-    Marathon,
-    Chronos
+    fn deploy(&self, content: &String, cluster: &Cluster);
 
 }
 
+
 impl Framework {
 
-    pub fn of(descripor: &String) -> Option<Framework> {
+    pub fn of(descripor: &String) -> Option<Box<Framework>> {
         if descripor.ends_with(".job") {
-            Some(Framework::Chronos)
+            Some(Box::new(Chronos))
         } else if descripor.ends_with(".srv") {
-            Some(Framework::Marathon)
+            Some(Box::new(Marathon))
         } else {
             None
         }
@@ -22,4 +22,22 @@ impl Framework {
 
 }
 
+struct Chronos;
 
+impl Framework for Chronos {
+
+    fn deploy(&self, content: &String, cluster: &Cluster){
+        println!("Chronos({}) -> \n{}", cluster.chronos, content);
+    }
+
+}
+
+struct Marathon;
+
+impl Framework for Marathon {
+
+    fn deploy(&self, content: &String, cluster: &Cluster){
+        println!("Marathon({}) -> \n{}", cluster.marathon, content);
+    }
+   
+}

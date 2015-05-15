@@ -7,6 +7,7 @@ mod help;
 mod framework;
 mod deploy;
 mod status;
+mod configuration;
 mod arguments;
 mod file_walker;
 
