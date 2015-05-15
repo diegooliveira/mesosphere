@@ -15,19 +15,19 @@ impl HelpPrinter {
 		}
 	}
 	
-	pub fn long(&mut self, help: String){
+	pub fn long(&mut self, help: &str){
 		println!("{}", help);
 	}
 
-	pub fn short(&mut self, name: String, desc: String){
+	pub fn short(&mut self, name: &str, desc: &str){
 	
 		let command_size = name.len() as u32;
 		if self.command_size < command_size {
 			self.command_size = command_size;
 		}
 
-		self.commands.push(name);
-		self.descriptions.push(desc);
+		self.commands.push(name.to_owned());
+		self.descriptions.push(desc.to_owned());
 	}
 
 	pub fn print(&self) {

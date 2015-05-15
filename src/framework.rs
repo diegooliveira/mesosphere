@@ -1,6 +1,7 @@
 
 use configuration::Cluster;
 use hyper::Client;
+use hyper::client::{RequestBuilder, IntoUrl};
 use hyper::header;
 use hyper::status::StatusCode;
 use hyper::client::response::Response;
@@ -9,9 +10,9 @@ use hyper::mime::Mime;
 pub trait Framework {
 
     fn deploy(&self, content: &String, cluster: &Cluster);
+    fn statusByContent(&self, content: &String, cluster: &Cluster);
 
 }
-
 
 impl Framework {
 
@@ -24,7 +25,6 @@ impl Framework {
             None
         }
     }
-
 }
 
 struct Chronos;
@@ -39,10 +39,12 @@ impl Framework for Chronos {
                 }
             },
             None => {}
-        
         }
     }
-
+    
+    fn statusByContent(&self, content: &String, cluster: &Cluster){
+        
+    }
 }
 
 struct Marathon;
@@ -53,7 +55,7 @@ impl Framework for Marathon {
         match post(content, &cluster.marathon, "/v2/apps"){
             Some(response) => {
                 if response.status == StatusCode::Conflict {
-                    match read("id", &content) {
+                    match read_field("id", &content) {
                         Some(id) => {
                             let srv_address = "/v2/apps/".to_string() + &id;
                             put(content, &cluster.marathon, &srv_address);
@@ -69,31 +71,57 @@ impl Framework for Marathon {
             _ => {}
         }
     }
+    
+    fn statusByContent(&self, content: &String, cluster: &Cluster){
+        match read_field("id", &content) {
+            Some(id) => {
+                let srv_address = "/v2/apps/".to_string() + &id;
+                match get(&cluster.marathon, &srv_address) {
+                    Some(mut response) => {
+                        
+                        use std::io;
+                        
+                        println!("{:?}", response);
+                        io::copy(&mut response, &mut io::stdout()).unwrap();
+                    },
+                    None => {
+                        
+                    }
+                }
+            },
+            None => {
+                println!("Impossible to get status, missing id field");
+            }
+        }
+    }
 }
 
 fn post(content: &str, address: &str, uri: &str) -> Option<Response> {
     let path = address.to_owned() + uri;
-    let mime: Mime = "application/json".parse().unwrap();
     let mut client = Client::new();
-    match client.post(&path)
-        .header(header::Connection::close())
-        .header(header::ContentType(mime))
-        .body(content).send() {
-        Ok(response) => {
-            Some(response)
-        }, 
-        Err(why) => {
-            println!("error send data to {}", address); 
-            return None
-        }
-    }
+    let post = client.post(&path);
+    return execute(post, content);
 }
 
 fn put(content: &str, address: &str, uri: &str) -> Option<Response> {
     let path = address.to_owned() + uri;
-    let mime: Mime = "application/json".parse().unwrap();
+    
     let mut client = Client::new();
-    match client.put(&path)
+    let put = client.put(&path);
+    return execute(put, content);
+}
+
+fn get(address: &str, uri: &str) -> Option<Response> {
+    let path = address.to_owned() + uri;
+    
+    let mut client = Client::new();
+    let get = client.get(&path);
+    return execute(get, "");
+}
+
+fn execute<'a, T : IntoUrl>(request : RequestBuilder<'a, T>, content: &'a str) -> Option<Response> {
+    let mime: Mime = "application/json".parse().unwrap();
+    match request
         .header(header::Connection::close())
         .header(header::ContentType(mime))
         .body(content).send() {
@@ -101,16 +129,16 @@ fn put(content: &str, address: &str, uri: &str) -> Option<Response> {
             Some(response)
         }, 
         Err(why) => {
-            println!("error send data to {}", address); 
+            println!("error send data to : {}", why); 
             return None
         }
     }
 }
 
-fn read(field: &str, content: &str) -> Option<String> {
+fn read_field(field: &str, content: &str) -> Option<String> {
     use regex::Regex;
-    let regex = "\"".to_string() + field + "\" : \"(.*)\"";
-    let re = match Regex::new(&regex) {
+    let regex = "\"".to_string() + field + "\".*:.*\"(.*)\"";
+    match Regex::new(&regex) {
         Ok(re) => {
             for cap in re.captures_iter(content) {
                 return Some(cap.at(1).unwrap().to_string());
@@ -119,7 +147,6 @@ fn read(field: &str, content: &str) -> Option<String> {
         },
         Err(err) => panic!("{}", err),
     };
-
 }
 
 

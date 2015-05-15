@@ -4,7 +4,6 @@ use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
 use rustc_serialize::json;
-use framework::Framework;
 use arguments::{Arguments, ValueArgument};
 
 #[derive(RustcDecodable, Debug)]
@@ -42,7 +41,12 @@ impl Configuration {
 		    Ok(mut file) =>{
 		    
 		        let mut content = String::new();
-                file.read_to_string(&mut content);
+                match file.read_to_string(&mut content) {
+                    Ok(_) => {},
+                    Err(why) => {
+                        println!("Error reading {} : {}", &path, why);
+                    }
+                }
                 
                 match json::decode::<Configuration>(&content) {
                     Ok(config) => {
@@ -81,6 +85,12 @@ impl Configuration {
 		    }
 		    
 		}
-    } 
-    
+    }    
 }
+
+pub const CONFIGURATION_ARGS_OPTIONS : &'static str = "
+Configuratio Options:
+    --cfg PATH     Path to the configuration file
+    --env NAME     Name of the target cluster
+";
+

@@ -3,7 +3,7 @@ use command::Command;
 use help::HelpPrinter;
 use arguments::Arguments;
 use framework::Framework;
-use configuration::Configuration;
+use configuration::{Configuration, CONFIGURATION_ARGS_OPTIONS};
 use file_walker;
 
 
@@ -13,6 +13,7 @@ impl Command for Deploy {
 
 	fn execute(&self, mut args: Arguments){
 		
+		// Reading the cluster configuration
 		let cluster = match Configuration::load(&mut args){
 		    Some(cfg) => cfg,
 		    None => {
@@ -20,6 +21,7 @@ impl Command for Deploy {
 		    }
 		};
 		
+		// Validating any aditional parameter
 		match args.get_remmaning_params() {
 		    Some(params) => {
 		        println!("Invalid parameters:");
@@ -49,22 +51,30 @@ impl Command for Deploy {
 		        }
 		    });
 		}
-		
 	}
 	
 	fn show_short_help(&self, hp : &mut HelpPrinter){
-		hp.short("deploy".to_string(), "Deploys the service or job configuration".to_string()	);
+		hp.short("deploy", "Deploys the service or job configuration");
 	}
 	
 	fn show_long_help(&self, hp : &mut HelpPrinter){
-		hp.long("
-Teste de help longo		
-		
-		".to_string());
+		hp.long(LONG_HELP_TEXT);
+        hp.long(CONFIGURATION_ARGS_OPTIONS);
 	}
 	
 	fn is_called(&self, name: &String) -> bool {
 		return "deploy" == name;
-	}
-	
+	}	
 }
+
+const LONG_HELP_TEXT : &'static str = 
+"Deploy or update a configuration description to a framework. The target framework
+is discovered by parameter or file extension. 
+
+Usage:
+    mesosphere deploy [options] [args...]
+        
+Arguments:
+    args    Paths to the deployment descriptors
+";
+

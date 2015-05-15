@@ -2,6 +2,8 @@
 use command::Command;
 use help::HelpPrinter;
 use arguments::{Arguments, ValueArgument};
+use framework::Framework;
+use configuration::{Configuration, CONFIGURATION_ARGS_OPTIONS};
 use file_walker;
 
 pub struct Status;
@@ -28,15 +30,12 @@ impl Command for Status {
 
 	fn execute(&self, mut args: Arguments){
 		
-		/*
-		let cluster = match Cluster::fromArgs(args) {
-		    Some(c) => c,
-		    Err(why) => {
-		    
+		let cluster = match Configuration::load(&mut args){
+		    Some(cfg) => cfg,
+		    None => {
+		        return;
 		    }
 		};
-		*/
-
 
 		match args.get_param("--srv") {
 		    ValueArgument::Supplied(srv_id) => {
@@ -90,16 +89,27 @@ impl Command for Status {
 		
 		let descriptors = args.get_arguments();
 		if !descriptors.is_empty() {
-		    file_walker::walk(descriptors, |y, x| println!("{}", x) );
+		    file_walker::walk(descriptors, |descriptor, content| {
+		    
+		        match Framework::of(descriptor) {
+		        
+		            Some(framework) => {
+    		            framework.statusByContent(&content, &cluster);
+		            },
+		            None => {
+		                println!("Invalid file: {}", descriptor);
+		            }
+		        }
+		    });
 		}
 	}
 	
 	fn show_short_help(&self, hp : &mut HelpPrinter){
-		hp.short("status".to_string(), "Show the service or job statys".to_string());
+		hp.short("status", "Show the service or job statys");
 	}
 	
 	fn show_long_help(&self, hp : &mut HelpPrinter){
-		hp.long(HELP_TEXT.to_string());
+		hp.long(HELP_TEXT);
 	}
 	
 	fn is_called(&self, name: &String) -> bool  {

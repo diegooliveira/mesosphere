@@ -36,7 +36,7 @@ impl CommandList {
 		for command in &self.commands {
 			command.show_short_help(&mut help_printer);
 		}
-		help_printer.short("help".to_string(), "Show this help or for a specific command".to_string());
+		help_printer.short("help", "Show this help or for a specific command");
 		help_printer.print();
 	}
 	
@@ -57,7 +57,6 @@ impl CommandList {
 							self.show_help();
 						},
 						Some(c) => {
-							println!("Help of {}", params[0]);
 							let mut help_printer = HelpPrinter::new();
 							c.show_long_help(&mut help_printer);
 						},
