@@ -1,3 +1,8 @@
 {
-    "id" : "sample-app-id"
+    "id" : "/sample-app-id",
+    "cmd": "chmod +x ./server.bin; ./server.bin -porta $PORT -nome Admin",
+	"cpus": 0.5,
+	"mem": 200,
+	"instances": 2,
+	"uris": ["http://a1-hundgreen-q-pla3.host.intranet/share/server.bin"]
 }

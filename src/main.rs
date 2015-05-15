@@ -1,6 +1,8 @@
 
 extern crate rustc_serialize;
 extern crate getopts;
+extern crate hyper;
+extern crate regex;
 
 mod command;
 mod help;

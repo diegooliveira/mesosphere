@@ -4,8 +4,8 @@
     [
         {
             "name" : "qa",
-            "marathon" : "http://qa.marathon.com.br",
-            "chronos" : "http://qa.chonos.com.br",
+            "marathon" : "http://10.133.129.26:8080",
+            "chronos" : "http://10.133.129.26:8081",
             "binary" : "http://qa.binay.com.br"
         },
         {
