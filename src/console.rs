@@ -98,9 +98,8 @@ pub fn success(msg: String) {
 
 pub const CONSOLE_OPTIONS_HELP_TEXT : &'static str = 
 "Console Options:
-    --log LEVEL    Log levels (trace, debug, info, erro, off), default prints
-                    only erros
-    --log          Turn on info log.";
+    --log          Turn on info log.
+    --log LEVEL    One of trace, debug, info, erro or off";
     
 
 

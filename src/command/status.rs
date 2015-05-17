@@ -1,5 +1,5 @@
 
-use command::Command;
+use super::Command;
 use help::HelpPrinter;
 use arguments::{Arguments, ValueArgument};
 use framework::Framework;

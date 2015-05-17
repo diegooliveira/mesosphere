@@ -8,23 +8,21 @@ extern crate regex;
 mod command;
 mod help;
 mod framework;
-mod deploy;
 mod console;
-mod status;
 mod configuration;
 mod arguments;
 mod file_walker;
+mod psmesos;
 
 use std::env;
+use psmesos::PsMesos;
 
 fn main() {
 
 	let args: Vec<String> = env::args().collect();
 	
-	let mut commands = command::CommandList::new();
-	commands.register(Box::new(deploy::Deploy));
-	commands.register(Box::new(status::Status));
-	commands.process(args);
+	let psmesos = PsMesos::new();
+	psmesos.process(args);
 	
 }
 

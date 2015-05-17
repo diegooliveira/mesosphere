@@ -1,32 +1,27 @@
 
 use help::HelpPrinter;
 use arguments::Arguments;
+use command::Command;
+use command::deploy::Deploy;
+use command::status::Status;
 use console;
 
-/// The command structure
-pub trait Command {
-	fn show_short_help(&self, &mut HelpPrinter);
-	fn show_long_help(&self, &mut HelpPrinter);
-
-	fn execute(&self, mut args: Arguments);
-	fn is_called(&self, &String) -> bool;
-}
-
-pub struct CommandList {
+pub struct PsMesos {
 	commands : Vec<Box<Command>>,
 }
 
-impl CommandList {
+
+impl PsMesos {
 
 	/// Create a new CommandList
-	pub fn new() -> CommandList {
-		return CommandList {commands : Vec::new()}
-	}
-
-	// Register new commands in this command list 
-	pub fn register(&mut self, command: Box<Command>){
-		let mut commands = &mut self.commands;
-		commands.push(command);
+	pub fn new() -> Self {
+	
+	    let mut commands : Vec<Box<Command>> = Vec::new();
+		
+		commands.push(Box::new(Deploy));
+	    commands.push(Box::new(Status));
+	
+		return PsMesos {commands : commands}
 	}
 
 	/// Show help for all commands
@@ -94,9 +89,3 @@ impl CommandList {
 			} 
 	}
 }
-
-
-
-
-
-

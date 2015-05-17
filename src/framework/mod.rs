@@ -7,6 +7,7 @@ use hyper::status::StatusCode;
 use hyper::client::response::Response;
 use hyper::mime::Mime;
 use hyper::error::Error;
+use std::io::{Read};
 use console;
 
 pub trait Framework {
@@ -87,11 +88,10 @@ impl Framework for Marathon {
 				let srv_address = "/v2/apps/".to_string() + &id;
 				match get(&cluster.marathon, &srv_address) {
 					Ok(mut response) => {
-
-						use std::io;
-
 						println!("{:?}", response);
-						io::copy(&mut response, &mut io::stdout()).unwrap();
+						let mut w = String::new();
+						response.read_to_string(&mut w).unwrap();
+						console::success(format!("{}", w));
 					},
 					Err(why) => {
 
