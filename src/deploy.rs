@@ -3,7 +3,8 @@ use command::Command;
 use help::HelpPrinter;
 use arguments::Arguments;
 use framework::Framework;
-use configuration::{Configuration, CONFIGURATION_ARGS_OPTIONS};
+use console;
+use configuration::{Configuration, CONFIGURATION_OPTIONS_HELP_TEXT};
 use file_walker;
 
 
@@ -24,9 +25,9 @@ impl Command for Deploy {
 		// Validating any aditional parameter
 		match args.get_remmaning_params() {
 		    Some(params) => {
-		        println!("Invalid parameters:");
+		        console::erro(format!("Invalid parameters:"));
 		        for param in params {
-    		        println!("\t{}", param.name);
+    		        console::erro(format!("\t{}", param.name));
 		        }
 		        return;     
 		    },
@@ -35,7 +36,7 @@ impl Command for Deploy {
 		
 	    let descriptors = args.get_arguments();
 		if descriptors.is_empty() {
-		   println!("Error: Missing deployment descriptor"); 
+		   console::erro(format!("Error: Missing deployment descriptor")); 
 		} else {
 		    file_walker::walk(descriptors, |descriptor, content| {
 		    
@@ -43,10 +44,11 @@ impl Command for Deploy {
 		        match Framework::of(descriptor) {
 		        
 		            Some(framework) => {
+    		            console::info(format!("Sending {}", &descriptor));
     		            framework.deploy(&content, &cluster);
 		            },
 		            None => {
-		                println!("Invalid file: {}", descriptor);
+		                console::erro(format!("Invalid file: {}", descriptor));
 		            }
 		        }
 		    });
@@ -59,7 +61,7 @@ impl Command for Deploy {
 	
 	fn show_long_help(&self, hp : &mut HelpPrinter){
 		hp.long(LONG_HELP_TEXT);
-        hp.long(CONFIGURATION_ARGS_OPTIONS);
+        hp.long(CONFIGURATION_OPTIONS_HELP_TEXT);
 	}
 	
 	fn is_called(&self, name: &String) -> bool {
@@ -75,6 +77,5 @@ Usage:
     mesosphere deploy [options] [args...]
         
 Arguments:
-    args    Paths to the deployment descriptors
-";
+    args    Paths to the deployment descriptors";
 

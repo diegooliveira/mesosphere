@@ -27,7 +27,7 @@ impl Configuration {
     pub fn load(arg: &mut Arguments) -> Option<Cluster> {
     
         // Checking if there is a custom configuration flag and if it is valid
-        let path = match arg.get_param("--cfg") {
+        let path = match arg.get_option("--cfg") {
 		    ValueArgument::NotSupplied => ".mesosphere".to_string(),
 		    ValueArgument::Supplied(path) => path,
 		    ValueArgument::MissingValue => {
@@ -51,7 +51,7 @@ impl Configuration {
                 match json::decode::<Configuration>(&content) {
                     Ok(config) => {
                         
-                        let target = match arg.get_param("--env") {
+                        let target = match arg.get_option("--env") {
 		                    ValueArgument::NotSupplied => config.default.clone(),
 		                    ValueArgument::Supplied(target) => target,
 		                    ValueArgument::MissingValue => {
@@ -88,9 +88,8 @@ impl Configuration {
     }    
 }
 
-pub const CONFIGURATION_ARGS_OPTIONS : &'static str = "
+pub const CONFIGURATION_OPTIONS_HELP_TEXT : &'static str = "
 Configuratio Options:
     --cfg PATH     Path to the configuration file
-    --env NAME     Name of the target cluster
-";
+    --env NAME     Name of the target cluster";
 

@@ -3,28 +3,11 @@ use command::Command;
 use help::HelpPrinter;
 use arguments::{Arguments, ValueArgument};
 use framework::Framework;
-use configuration::{Configuration, CONFIGURATION_ARGS_OPTIONS};
+use configuration::{Configuration, CONFIGURATION_OPTIONS_HELP_TEXT};
 use file_walker;
 
 pub struct Status;
 
-const HELP_TEXT : &'static str = "
-List the status of all the supplied configurations. It is possible to pass the
-configuration name in two forms: the path of an especification file or the 
-job/service name.
-
-Sample usage:
-
-    mesosphere status *
-        - Show the status for all especifications in the current dir
-
-    mesosphere status hourely.job site.srv
-        - Show the status for the job espcification \"hourely.job\" and the
-        service especification \"site.srv\".
-        
-    mesosphere status --job my-test-job --job other-job-name --service my-app
-        - Show the status 
-";
 
 impl Command for Status {
 
@@ -37,7 +20,7 @@ impl Command for Status {
 		    }
 		};
 
-		match args.get_param("--srv") {
+		match args.get_option("--srv") {
 		    ValueArgument::Supplied(srv_id) => {
 		        // List the content of the supplied directory
 		        // and deploy everething 
@@ -50,7 +33,7 @@ impl Command for Status {
 		    _ => { }
 		}
 		
-		match args.get_param("--job") {
+		match args.get_option("--job") {
 		    ValueArgument::Supplied(job_id) => {
 		        // List the content of the supplied directory
 		        // and deploy everething 
@@ -63,7 +46,7 @@ impl Command for Status {
 		    _ => { }
 		}
 		
-		match args.get_param("-r") {
+		match args.get_option("-r") {
 		    ValueArgument::Supplied(directory) => {
 		        // List the content of the supplied directory
 		        // and deploy everething 
@@ -94,7 +77,7 @@ impl Command for Status {
 		        match Framework::of(descriptor) {
 		        
 		            Some(framework) => {
-    		            framework.statusByContent(&content, &cluster);
+    		            framework.status_by_content(&content, &cluster);
 		            },
 		            None => {
 		                println!("Invalid file: {}", descriptor);
@@ -110,6 +93,7 @@ impl Command for Status {
 	
 	fn show_long_help(&self, hp : &mut HelpPrinter){
 		hp.long(HELP_TEXT);
+		hp.long(CONFIGURATION_OPTIONS_HELP_TEXT);
 	}
 	
 	fn is_called(&self, name: &String) -> bool  {
@@ -117,4 +101,15 @@ impl Command for Status {
 	}
 }
 
+const HELP_TEXT : &'static str = 
+"Show the status of all the supplied configurations. It is possible to pass the
+configuration name in two forms: the path of an especification file or the 
+job/service name.
+
+Usage:
+    mesosphere status [options] [args...]
+ 
+Status Options:
+    --srv SRV_ID     The service id
+    --job JOB_NAME   The job name";
 

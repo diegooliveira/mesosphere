@@ -1,7 +1,7 @@
 
 
-use std::error::Error;
 use std::fs::File;
+use console;
 use std::io::prelude::*;
 
 pub fn walk<T>(descriptors : Vec<String>, handler : T) -> ()
@@ -19,12 +19,12 @@ pub fn walk<T>(descriptors : Vec<String>, handler : T) -> ()
                         handler(&desc, content);
                     },
                     Err(why) => {
-                        println!("Error reading {} - cause: {}", &desc, Error::description(&why));
+                        console::erro(format!("Error reading {} - cause: {}", &desc, why));
                     }
                 }
             },
             Err(why) => {
-                println!("Error open \"{}\" - cause: {}", &desc, why);
+                console::erro(format!("Error opening \"{}\" - cause: {}", &desc, why));
             }
         }
     }

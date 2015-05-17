@@ -19,6 +19,12 @@
             "marathon" : "http://tb.marathon.com.br",
             "chronos" : "http://tb.chonos.com.br",
             "binary" : "http://tb.binay.com.br"
+        },
+        {
+            "name" : "diego",
+            "marathon" : "http://localhost:8080",
+            "chronos" : "http://tb.chonos.com.br",
+            "binary" : "http://tb.binay.com.br"
         }
     ]
 }

@@ -3,6 +3,7 @@
 #[derive(Debug)]
 pub struct Arguments {
     args: Vec<ArgValue>,
+    command: Option<String>,
     parameters: Vec<String>,
 }
 
@@ -20,12 +21,14 @@ pub struct ArgValue {
 }
 
 impl Arguments {
-	
-	pub fn new(args: &[String]) -> Self {
-	
-	    let mut parsed_args = Vec::new();
+
+    pub fn new(args: &Vec<String>) -> Self {
+        let command = if args.len() > 1 { Some(args[1].clone()) } else { None  };
+        
+        let mut parsed_args = Vec::new();
 	    let mut parsed_params = Vec::new();
-	    let mut curr_idx = 0;
+	    
+	    let mut curr_idx = 2;
 	    while curr_idx < args.len() {
 	        let current = args[curr_idx].clone();
 	        if is_paramenter(&current) {
@@ -60,12 +63,16 @@ impl Arguments {
 	        }
     	    curr_idx = curr_idx + 1;
 	    }
-	    
-		return Arguments{args: parsed_args, parameters: parsed_params};
+        
+        return Arguments{args: parsed_args, parameters: parsed_params, command : command}
+    }
+	
+	pub fn get_command(&self) -> Option<String> {
+	    return self.command.clone();
 	}
 	
 	/// Get the argument value and remove from the avealeble args
-	pub fn get_param(&mut self, name : &str) -> ValueArgument {
+	pub fn get_option(&mut self, name : &str) -> ValueArgument {
 	    
 	    match self.args.iter().position(|arg| *arg.name == name.to_owned()) {
 	        None => return ValueArgument::NotSupplied,
