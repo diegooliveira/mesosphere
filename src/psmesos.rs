@@ -4,6 +4,8 @@ use arguments::Arguments;
 use command::Command;
 use command::deploy::Deploy;
 use command::status::Status;
+use command::upload::Upload;
+use command::list::List;
 use console;
 
 pub struct PsMesos {
@@ -19,7 +21,9 @@ impl PsMesos {
 	    let mut commands : Vec<Box<Command>> = Vec::new();
 		
 		commands.push(Box::new(Deploy));
+	    commands.push(Box::new(Upload));
 	    commands.push(Box::new(Status));
+	    commands.push(Box::new(List));
 	
 		return PsMesos {commands : commands}
 	}

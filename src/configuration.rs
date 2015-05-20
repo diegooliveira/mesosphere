@@ -3,12 +3,16 @@
 use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
+
 use rustc_serialize::json;
+
 use arguments::{Arguments, ValueArgument};
+use console;
+
 
 #[derive(RustcDecodable, Debug)]
 pub struct Configuration {
-    default: String,
+    default_cluster: String,
     cluster: Vec<Cluster>,
     ext: Option<String>
 }
@@ -18,9 +22,15 @@ pub struct Cluster {
     name: String,
     pub marathon: String,
     pub chronos: String,
-    pub binary: String
+    pub binary: Binary
 }
 
+#[derive(RustcDecodable, Debug)]
+pub struct Binary {
+    pub address : String,
+    pub user: Option<String>,
+    pub passwd: Option<String>,
+}
 
 impl Configuration {
 
@@ -44,7 +54,8 @@ impl Configuration {
                 match file.read_to_string(&mut content) {
                     Ok(_) => {},
                     Err(why) => {
-                        println!("Error reading {} : {}", &path, why);
+                        console::erro(format!("Error reading {} : {}", &path, why));
+                        return None;
                     }
                 }
                 
@@ -52,7 +63,7 @@ impl Configuration {
                     Ok(config) => {
                         
                         let target = match arg.get_option("--env") {
-		                    ValueArgument::NotSupplied => config.default.clone(),
+		                    ValueArgument::NotSupplied => config.default_cluster.clone(),
 		                    ValueArgument::Supplied(target) => target,
 		                    ValueArgument::MissingValue => {
 		                        println!("Invalid target env, use --env ENV_NAME");
@@ -66,30 +77,31 @@ impl Configuration {
                             }
                         }
                           
-                        println!("Undefined target env {}", target);
+                        console::erro(format!("Undefined target env '{}'", target));
                         return None 
                         
                     },
                     Err(why) => {
                     
                         // Error parsing the config file
-                        println!("Invalid content in \"{}\": {}", &path, why); //
+                        console::erro(format!("Invalid content in '{}': {}", &path, why)); //
                         return None
                     }
                 }
 		    },
 		    Err(cause) => {
 		        //Error opening the file
-		        println!("Error reading configuration \"{}\": {}", &path, cause);
+		        console::erro(format!("Error reading configuration '{}': {}", &path, cause));
 		        return None
 		    }
-		    
 		}
     }    
 }
 
 pub const CONFIGURATION_OPTIONS_HELP_TEXT : &'static str = "
 Configuratio Options:
-    --cfg PATH     Path to the configuration file
-    --env NAME     Name of the target cluster";
+    --cfg PATH     Path to the configuration file, defaults to a file called 
+                   \".mesosphere\" in the path.
+    --env NAME     Name of the target cluster. If not supplied it uses the 
+                   \"default_cluster\" attribute from the configuration.";
 

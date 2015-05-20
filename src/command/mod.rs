@@ -1,6 +1,8 @@
 
 pub mod deploy;
 pub mod status;
+pub mod list;
+pub mod upload;
 
 use help::HelpPrinter;
 use arguments::Arguments;

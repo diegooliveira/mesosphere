@@ -73,11 +73,11 @@ impl Framework for Marathon {
 				} else if !response.status.is_success() {
 					console::erro(format!("Error deploing, status code: {}", response.status));
 				} else {
-				    console::success(format!("\t[SUCCESS] {}", response.status));
+				    console::success(format!("[SUCCESS] {}", response.status));
 				}
 			},
 			Err(why) => {
-			    console::erro(format!("\t[ERROR] {}", why)); 
+			    console::erro(format!("[ERROR] {}", why)); 
 			}
 		}
 	}

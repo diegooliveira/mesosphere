@@ -31,7 +31,11 @@ pub fn configure(args: &mut Arguments) {
 			    LogLevel::Info
 			},
 			ValueArgument::NotSupplied => {
-			    LogLevel::Erro
+			    if args.has_flag("-v") {
+			        LogLevel::Info
+    	        } else { 
+    			    LogLevel::Erro
+    			}
 			}
 		}
 	};
@@ -78,6 +82,14 @@ pub fn info(msg: String) {
 	}
 }
 
+pub fn debug(msg: String) {
+	unsafe {   
+		if LogLevel::Debug >= log_level {
+			println!("{}", msg);
+		}
+	}
+}
+
 pub fn success(msg: String) {
 	unsafe {   
 		if LogLevel::Info >= log_level {
@@ -96,9 +108,9 @@ pub fn success(msg: String) {
 	}
 }
 
-pub const CONSOLE_OPTIONS_HELP_TEXT : &'static str = 
-"Console Options:
-    --log          Turn on info log.
+pub const CONSOLE_OPTIONS_HELP_TEXT : &'static str = "
+Console Options:
+    -v             Turn on info log.
     --log LEVEL    One of trace, debug, info, erro or off";
     
 
